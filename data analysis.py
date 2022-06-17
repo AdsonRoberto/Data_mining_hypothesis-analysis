@@ -81,3 +81,22 @@ def donnut(values, labels, size = (8,8), col = None, pct = 0.5):
   p=plt.gcf()
   p.gca().add_artist(my_circle)
   plt.show()
+
+  #load all files
+files_path = '/content/drive/MyDrive/Mineracao/Logs'
+files_list = os.listdir(files_path)
+dfs = []
+for log in files_list:
+  print(log)
+  file_path = files_path + '/' + log
+  df = pd.read_csv(file_path, error_bad_lines=False, sep=',')
+  dfs.append(df)
+df = pd.concat(dfs)
+
+# ordem cronológica
+df['data_hora_mensagem'] = pd.to_datetime(df['data_hora_mensagem'])
+df = df.sort_values(by='data_hora_mensagem')
+print()
+print('Logs do STUART')
+df.reset_index(inplace=True,drop=True)
+df.head(3)
