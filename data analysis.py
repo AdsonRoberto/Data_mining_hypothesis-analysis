@@ -512,4 +512,36 @@ print()
 variation_stuart = 100*(mean_stuart - after_mean)/after_mean
 print('Alunos enviaram em média {a:.1f}% a mais de mensagens para o STUART do que para tutores'.format(a=variation_stuart))
 
+#Teste de hipótese
+
+from scipy import stats
+# teste de normalidade.
+# Abaixo de 0.05, significativo. Acima de 0.05, não significativo.
+# No caso de uma valor significativo para a estatística do teste, isso indica falta de normalidade para a variável aleatória analisada
+# p > 0.05 = NÃO-SIGNIFICATIVO = NORMAL.
+s, p = stats.shapiro(timeseries_std2tut_before)
+print('antes',s,p)
+if p > 0.05:
+  print('provavelmente normal')
+else:
+  print('provavelmente não é normal')
+  
+print()
+
+s,p = stats.shapiro(timeseries_std2tut_after)
+print('depois',s,p)
+if p > 0.05:
+  print('provavelmente normal')
+else:
+  print('provavelmente não é normal')
+
+  stat, p = stats.ttest_ind(timeseries_std2tut_after, timeseries_std2tut_before)
+print('stat=%.3f, p=%.3f' % (stat, p))
+if p > 0.05:
+	print('provavelmente a mesma média')
+else:
+	print('provavelmente médias diferentes')
+
+    
+
 
