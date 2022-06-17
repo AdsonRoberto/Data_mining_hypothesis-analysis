@@ -243,3 +243,194 @@ fig.update_layout(legend=dict(
     x=0.01
 ))
 fig.show()
+
+series = timeseries_std2tut[['data_hora', 'mensagens']].set_index('data_hora')
+series = series.asfreq('D')
+
+result_a = seasonal_decompose(series, model='additive')
+result_m = seasonal_decompose(series, model='multiplicative')
+
+fig, axes = plt.subplots(2, 4, figsize=(16, 8), sharex=True)
+
+sns.lineplot(data=result_a.observed, x='data_hora', y='mensagens', ax=axes[0, 0])
+sns.lineplot(data=result_a.seasonal, x='data_hora', y='mensagens', ax=axes[0, 1])
+sns.lineplot(data=result_a.trend, x='data_hora', y='mensagens', ax=axes[0, 2])
+sns.lineplot(data=result_a.resid, x='data_hora', y='mensagens', ax=axes[0, 3])
+
+sns.lineplot(data=result_m.observed, x='data_hora', y='mensagens', ax=axes[1, 0])
+sns.lineplot(data=result_m.seasonal, x='data_hora', y='mensagens', ax=axes[1, 1])
+sns.lineplot(data=result_m.trend, x='data_hora', y='mensagens', ax=axes[1, 2])
+sns.lineplot(data=result_m.resid, x='data_hora', y='mensagens', ax=axes[1, 3])
+
+plt.tight_layout()
+
+sns.lineplot(data=result_a.trend + result_a.seasonal, x='data_hora', y='mensagens')
+sns.lineplot(data=result_a.observed, x='data_hora', y='mensagens')
+
+trend_tutores = result_a.trend
+seasonal_tutores = result_a.seasonal
+observed_tutores = result_a.observed
+
+series = timeseries_users[['data_hora', 'mensagens']].set_index('data_hora')
+series = series.asfreq('D')
+
+result_a = seasonal_decompose(series, model='additive')
+result_m = seasonal_decompose(series, model='multiplicative')
+
+fig, axes = plt.subplots(2, 4, figsize=(16, 8), sharex=True)
+
+sns.lineplot(data=result_a.observed, x='data_hora', y='mensagens', ax=axes[0, 0])
+sns.lineplot(data=result_a.seasonal, x='data_hora', y='mensagens', ax=axes[0, 1])
+sns.lineplot(data=result_a.trend, x='data_hora', y='mensagens', ax=axes[0, 2])
+sns.lineplot(data=result_a.resid, x='data_hora', y='mensagens', ax=axes[0, 3])
+
+sns.lineplot(data=result_m.observed, x='data_hora', y='mensagens', ax=axes[1, 0])
+sns.lineplot(data=result_m.seasonal, x='data_hora', y='mensagens', ax=axes[1, 1])
+sns.lineplot(data=result_m.trend, x='data_hora', y='mensagens', ax=axes[1, 2])
+sns.lineplot(data=result_m.resid, x='data_hora', y='mensagens', ax=axes[1, 3])
+
+plt.tight_layout()
+
+sns.lineplot(data=result_a.trend + result_a.seasonal, x='data_hora', y='mensagens')
+sns.lineplot(data=result_a.observed, x='data_hora', y='mensagens')
+
+trend_stuart = result_a.trend
+seasonal_stuart = result_a.seasonal
+observed_stuart = result_a.observed
+
+fig, ax = plt.subplots(1, 1, figsize=(7, 5))
+sns.lineplot(data=trend_tutores, x='data_hora', y='mensagens', color='red', ax=ax, label="Tendência")
+sns.lineplot(data=observed_tutores, x='data_hora', y='mensagens', alpha=0.5, color='k', ax=ax, label="Observação")
+ax.set_xticklabels(['Jan/2021', 'Fev/2021', 'Mar/2021', 'Abr/2021', 'Maio/2021'])
+ax.set_xlabel('')
+ax.set_ylabel('Número de Mensagens')
+
+fig, ax = plt.subplots(1, 1, figsize=(7, 5))
+sns.lineplot(data=trend_stuart, x='data_hora', y='mensagens', color='red', ax=ax, label="Tendência")
+sns.lineplot(data=observed_stuart, x='data_hora', y='mensagens', alpha=0.5, color='k', ax=ax, label="Observação")
+ax.set_xticklabels(['Jan/2021', 'Fev/2021', 'Mar/2021', 'Abr/2021', 'Maio/2021'])
+ax.set_xlabel('')
+ax.set_ylabel('Número de Mensagens')
+
+fig, axes = plt.subplots(2, 1, figsize=(15, 5), sharex=True)
+
+sns.lineplot(data=trend_tutores + seasonal_tutores, x='data_hora', y='mensagens', ax=axes[0])
+sns.lineplot(data=timeseries_std2tut, x='data_hora', y='mensagens', ax=axes[0])
+
+sns.lineplot(data=trend_stuart + seasonal_stuart, x='data_hora', y='mensagens', ax=axes[1])
+sns.lineplot(data=timeseries_users, x='data_hora', y='mensagens', ax=axes[1])
+
+fig, axes = plt.subplots(2, 1, figsize=(15, 5), sharex=True)
+
+sns.lineplot(data=observed_tutores, x='data_hora', y='mensagens', ax=axes[0], alpha=0.5, color='k')
+sns.lineplot(data=trend_tutores, x='data_hora', y='mensagens', ax=axes[0], color='r')
+
+sns.lineplot(data=observed_stuart, x='data_hora', y='mensagens', ax=axes[1], alpha=0.5, color='k')
+sns.lineplot(data=trend_stuart, x='data_hora', y='mensagens', ax=axes[1], color='r')
+
+#axes[1].set_xticklabels(['Jan/2021', 'Fev/2021', 'Mar/2021', 'Abr/2021', 'Maio/2021', 'Jun/2021', 'Jul/2021'])
+axes[1].set_xticklabels(['Set/2020', 'Out/2020', 'Nov/2020', 'Dez/2020', 'Jan/2021', 'Fev/2021', 'Mar/2021', 'Abr/2021', 'Maio/2021'])
+axes[1].set_xlabel('')
+axes[1].set_ylabel('Número de Mensagens')
+
+fig, ax = plt.subplots(1, 1, figsize=(7, 5), sharex=True)
+
+sns.lineplot(data=observed_tutores, x='data_hora', y='mensagens', ax=ax, alpha=0.5, color='k', label='Observado (Tutors)')
+sns.lineplot(data=trend_tutores, x='data_hora', y='mensagens', ax=ax, color='r', label='Tendência (Tutors)')
+
+sns.lineplot(data=observed_stuart, x='data_hora', y='mensagens', ax=ax, alpha=0.5, color='k', linestyle="--", label="Observado (Stuart)")
+sns.lineplot(data=trend_stuart, x='data_hora', y='mensagens', ax=ax, color='b', label="Tendência (Stuart)")
+plt.legend()
+
+ticks_locations = ax.get_xticks()
+ax.set_xticklabels(['Set/2020', 'Out/2020', 'Nov/2020', 'Dez/2020', 'Jan/2021', 'Fev/2021', 'Mar/2021', 'Abr/2021', 'Mai/2021', 'Jun/2021', 'Jul/2021'], rotation=45)
+ax.set_xlabel('')
+ax.set_ylabel('Número de Mensagens')
+plt.tight_layout()
+
+ticks_locations
+
+fig, ax = plt.subplots(1, 1, figsize=(7, 5))
+
+sns.lineplot(data=trend_tutores, x='data_hora', y='mensagens', ax=ax, color='r', label='Tutors')
+sns.lineplot(data=trend_stuart, x='data_hora', y='mensagens', ax=ax, color='b', label='Stuart')
+ax.set_xticklabels(['Oct/2020', 'Nov/2020', 'Dec/2020', 'Jan/2021', 'Feb/2021', 'Mar/2021', 'Apr/2021', 'May/2021'], rotation=45)
+ax.set_xlabel('')
+ax.set_ylabel('Number of Messages')
+plt.legend(title='Trend')
+
+fig, ax = plt.subplots(1, 1, figsize=(7, 5))
+
+sns.lineplot(data=seasonal_tutores, x='data_hora', y='mensagens', ax=ax, color='r', label='Tutors')
+sns.lineplot(data=seasonal_stuart, x='data_hora', y='mensagens', ax=ax, color='b', label='Stuart')
+ax.set_xticklabels(['Sep/2020', 'Oct/2020', 'Nov/2020', 'Dec/2020', 'Jan/2021', 'Feb/2021', 'Mar/2021', 'Apr/2021', 'May/2021'], rotation=45)
+ax.set_xlabel('')
+ax.set_ylabel('Number of Messages')
+plt.legend(title='Seasonality')
+
+seasonal_stuart.index
+
+t = seasonal_stuart.index
+x = seasonal_stuart['mensagens'].values
+ind = np.where(np.isclose(x, np.min(x)))[0]
+period = np.diff(ind)[0]
+print(period)
+
+t = seasonal_tutores.index
+x = seasonal_tutores['mensagens'].values
+ind = np.where(np.isclose(x, np.min(x)))[0]
+period = np.diff(ind)[0]
+print(period)
+
+X = fft(timeseries_std2tut['mensagens'])
+plt.plot(np.abs(X)[1:])
+
+X = fft(timeseries_std2tut['mensagens'])
+amplitudes = np.abs(X)[1:]
+# Filter low amplitude frequencies
+threshold = 500
+X[np.where(amplitudes < threshold)[0]] = 0
+print('filtering {} frequencies'.format(len(np.where(amplitudes < threshold)[0])))
+
+filtered_series = ifft(X)
+
+plt.plot(timeseries_std2tut['mensagens'])
+plt.plot(np.real(filtered_series))
+
+last_time = timeseries_std2tut['data_hora'].max()
+next_step_time = last_time + pd.Timedelta(days=14)
+print(last_time, next_step_time)
+
+model = sm.tsa.SARIMAX(timeseries_std2tut['MA'].values, order=(1, 1, 1), trend='ct')
+result = model.fit()
+
+print(result.summary())
+
+forecasted = result.forecast(steps=7)
+timestamps = [
+    last_time + pd.Timedelta(days=14 * i) for i in range(len(forecasted))
+]
+
+df_forecasted = pd.DataFrame()
+df_forecasted['data_hora'] = timestamps
+df_forecasted['forecast'] = forecasted
+
+df_forecasted
+
+fig = px.line(timeseries_std, x='data_hora', y='MA',
+              color="destinatário")
+
+fig.update_layout(legend=dict(
+    yanchor="bottom",
+    y=1.0,
+    xanchor="left",
+    x=0.01
+))
+fig.show()
+
+fig, ax = plt.subplots(figsize=(15, 5))
+sns.lineplot(data=timeseries_std, x='data_hora', y='MA',
+             hue="destinatário", ax=ax)
+sns.lineplot(data=df_forecasted, x='data_hora', y='forecast', ax=ax, color='k', linestyle='--')
+
+
