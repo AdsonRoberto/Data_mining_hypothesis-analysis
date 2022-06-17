@@ -561,4 +561,16 @@ df_message_by_student = pd.DataFrame({'Antes do STUART' : before_stuart, 'Depois
 df_message_by_student['variação (%)'] = 100*(df_message_by_student['Depois do STUART']-df_message_by_student['Antes do STUART'])/df_message_by_student['Antes do STUART']
 df_message_by_student.round(1)
 
+# Hipótese 3
+# mensagens média de mensagens por aluno
+before_stuart = message_id_ratio(df_tutors[df_tutors['data_hora'] < '2021-01-06' ],ids_profile='aluno',message_profile='ALUNO')
+after_stuart = message_id_ratio(df_tutors[df_tutors['data_hora'] >= '2021-01-06' ],ids_profile='aluno',message_profile='ALUNO')
+print('Mensagens de alunos/aluno')
+df_message_by_student = pd.DataFrame({'Antes do STUART' : before_stuart, 'Depois do STUART': after_stuart})
+df_message_by_student['variação (%)'] = 100*(df_message_by_student['Depois do STUART']-df_message_by_student['Antes do STUART'])/df_message_by_student['Antes do STUART']
+df_message_by_student.round(1)
+
+v = df_message_by_student.iloc[0].values
+i = df_message_by_student.iloc[0].index
+annotate_barchart(v,i, title = None, size = (10,5), rotate_xticks=False)
 
