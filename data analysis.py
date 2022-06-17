@@ -542,6 +542,23 @@ if p > 0.05:
 else:
 	print('provavelmente médias diferentes')
 
-    
+#redução da carga de trabalho de tutores
+
+before_stuart = message_id_ratio(df_tutors[df_tutors['data_hora'] < '2021-01-06' ],ids_profile='aluno')
+after_stuart = message_id_ratio(df_tutors[df_tutors['data_hora'] >= '2021-01-06' ],ids_profile='aluno')
+
+print('Mensagens de tutor/aluno')
+df_message_by_student = pd.DataFrame({'Antes do STUART' : before_stuart, 'Depois do STUART': after_stuart})
+df_message_by_student['variação (%)'] = 100*(df_message_by_student['Depois do STUART']-df_message_by_student['Antes do STUART'])/df_message_by_student['Antes do STUART']
+df_message_by_student.round(1)
+
+# média de mensagens por tutor
+before_stuart = message_id_ratio(df_tutors[df_tutors['data_hora'] < '2021-01-06' ],ids_profile='tutor')
+after_stuart = message_id_ratio(df_tutors[df_tutors['data_hora'] >= '2021-01-06' ],ids_profile='tutor')
+
+print('Média de mensagens por tutor')
+df_message_by_student = pd.DataFrame({'Antes do STUART' : before_stuart, 'Depois do STUART': after_stuart})
+df_message_by_student['variação (%)'] = 100*(df_message_by_student['Depois do STUART']-df_message_by_student['Antes do STUART'])/df_message_by_student['Antes do STUART']
+df_message_by_student.round(1)
 
 
