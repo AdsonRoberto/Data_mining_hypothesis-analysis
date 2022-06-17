@@ -574,3 +574,55 @@ v = df_message_by_student.iloc[0].values
 i = df_message_by_student.iloc[0].index
 annotate_barchart(v,i, title = None, size = (10,5), rotate_xticks=False)
 
+#Uso do chatbot por PcDs e Não-PcDs
+
+students_series = df.groupby('remetente').count().sort_values(by='autor_da_mensagem', ascending=False)['autor_da_mensagem'][1:]
+print('Quantidade de estudantes:',len(students_series))
+print('Média de mensagens por estudante:',students_series.mean())
+
+top_students = students_series[0:100]
+students_IDs = list(top_students.index)
+labels = [str(a) for a in students_IDs]
+values = top_students.values
+
+ids = students_series.index
+n_messages = students_series.values
+deficiency = []
+pcd_bool = []
+for id in ids:
+  id_def = df[df['remetente']==id]['deficiencia'].unique()[0]
+  deficiency.append(id_def)
+  if id_def == 'Nenhuma':
+    pcd_bool.append(False)
+  else:
+    pcd_bool.append(True)
+
+df_students = pd.DataFrame({'id':ids, 'número de mensagens': n_messages, 'deficiencia': deficiency, 'PcD': pcd_bool})
+
+sum =  df_students[df_students['PcD']==False]['número de mensagens'].sum()
+stu = df_students[df_students['PcD']==False]['id'].nunique()
+print(sum,stu)
+
+# estatisticas
+df_students_statistics = df_students[df_students['PcD']==False].describe()['número de mensagens'].to_frame()
+df_students_statistics['PcD'] = df_students[df_students['PcD']==True].describe()['número de mensagens']
+df_students_statistics.columns = ['Não-PcD','PcD']
+df_students_statistics.round(2)
+
+df_students['Tipo'] = ['PcD' if x else 'Não-PcD' for x in df_students['PcD']]
+
+plt.figure(figsize=(10,5))
+plt.title('Distribuições de mensagens por aluno')
+sns.boxplot(x="Tipo", y="número de mensagens", palette=['C2','C1'], data=df_students) #['C2','C5']
+
+# swarmplot
+plt.figure(figsize=(10,10))
+plt.title('Quantidade de mensagens por aluno')
+sns.swarmplot(x="PcD", y="número de mensagens", palette=['C2','C1'],size=6, data=df_students) #['C2','C5']
+
+
+
+
+
+
+
