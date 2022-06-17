@@ -668,7 +668,31 @@ annotate_barchart(rec.values[1:],['Avaliação positiva','Avaliação negativa']
 #plt.style.use('default')
 donnut(rec.values[1:],['Avaliação positiva','Avaliação negativa'],col=cols)
 
+#Encaminhamentos para correio interno
 
+def query_list(query,text):
+  text = text.lower()
+  for q in query:
+    if q in text:
+      return True
+  return False
+query = ['desculpa eu', 'to solve']
+df_stuart = df[(df['autor_da_mensagem']=='STUART')]
+list_sorry = list(df_stuart[[query_list(query,text) for text in df_stuart['mensagem'] ]]['mensagem'])
+forwards = len(list_sorry)
+df_students = df[(df['autor_da_mensagem']!='STUART')]
+interactions_students = len(df_students)
+foward_interaction_ratio = 100*(forwards/interactions_students)
+print('Total de interações dos alunos: {a:1d}'.format(a=interactions_students))
+print('Número de vezes em que o STUART não soube responder a uma dúvida: {a:1d} ({b:.1f}%)'.format(a=forwards,b=foward_interaction_ratio))
+
+for s in list_sorry:
+   print(s)
+
+cols = ['C4']
+val = [interactions_students, forwards]
+lab = ['Interações de alunos','Quantidade de vezes que STUART não soube responder']
+annotate_barchart(val, lab, title = 'Encaminhamentos', size = (10,5), col=cols, rotate_xticks=False)
 
 
 
