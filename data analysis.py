@@ -694,6 +694,88 @@ val = [interactions_students, forwards]
 lab = ['Interações de alunos','Quantidade de vezes que STUART não soube responder']
 annotate_barchart(val, lab, title = 'Encaminhamentos', size = (10,5), col=cols, rotate_xticks=False)
 
+#Eficiência do chatbot
+
+print('Total de interações dos alunos: {a:1d}'.format(a=interactions_students))
+
+query = ['legal!', 'deu certo', 'maravilha']
+list_solutioned = list(df_stuart[[query_list(query,text) for text in df_stuart['mensagem'] ]]['mensagem'])
+n_solutioned = len(list_solutioned)
+n_questions = 1446
+percent = (n_solutioned/n_questions)*100
+print('Total de dúvidas dos alunos: {a:1d}'.format(a=n_questions))
+print('Total de mensagens do STUART indicando que o problema foi resolvido: {a:1d} ({b:.1f}%)'.format(a=n_solutioned,b=percent))
+
+# amostragem de conversas
+import pickle
+pickle_path = "/content/drive/MyDrive/Mineracao/sample_requisitions.p" 
+sample = pickle.load(open(pickle_path, "rb" ))
+len(sample)
+
+def query_in(df,query):
+  messages = list(df['mensagem'])
+  match = []
+  #query = query.lower()
+  for m in messages:
+    if query == m:
+      match.append(True)
+    else:
+      match.append(False)
+  return df[match]
+
+def search_conversation(df, text, begin, end):
+  df_match = query_in(df,text)
+  author = df_match['autor_da_mensagem'].values[0]
+  sender = df_match['remetente'].values[0]
+  reciever = df_match['destinatario'].values[0]
+
+  # message sent by student; student = sender
+  if author != 'STUART':    
+    student = sender
+  # message sent by stuart. 
+  else:
+    student = reciever
+
+  df_conversation = df[(df['remetente']==student) | (df['destinatario']==student)].reset_index(drop=True) 
+  idx = query_in(df_conversation,text).index[0]
+  return df_conversation.loc[idx-begin:idx+end]
+
+def print_conversation(df, text, begin=0, end=5):
+  conversation = search_conversation(df,text,begin,end)
+  texts = list(conversation['mensagem'])
+  datas = list(conversation['timestamp'])
+  og_idx = begin
+
+  for i,tup in enumerate(zip(datas,texts)):
+    t = tup[1]
+    d = str(tup[0])
+    og = ''
+    if (i==og_idx):
+      og= 'ORIGINAL '
+    print(og + d +' --- ' +t)
+
+
+print_conversation(df,'olha ',1,5)
+
+val_path = "/content/drive/MyDrive/Mineracao/sample_validation.p"
+
+sample_validation = pickle.load(open(val_path, "rb" ))
+idx = len(sample_validation)
+idx
+while idx < len(sample):
+  print(idx)
+  request = sample[idx]
+  print_conversation(df,request,1,3)  
+  print()
+  label = input('1: ok | -1: falha | 0: pergunta inválida: ')
+  sample_validation.append(label)
+  pickle.dump(sample_validation, open(val_path, "wb" ))
+  idx += 1
+  print('------')
+
+  validation = pd.Series(sample_validation)
+validation.value_counts()
+
 
 
 
