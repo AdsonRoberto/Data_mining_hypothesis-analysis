@@ -100,3 +100,43 @@ print()
 print('Logs do STUART')
 df.reset_index(inplace=True,drop=True)
 df.head(3)
+
+# tutores
+tutor_csv = '/content/drive/MyDrive/Mineracao/Logs_tutores/tutors_updated.csv'
+df_tutors = pd.read_csv(tutor_csv, error_bad_lines=False, sep=',')
+df_tutors['data_hora'] = pd.to_datetime(df_tutors['data_hora'], dayfirst= True)
+
+# igualar a quantidade de semanas para antes e depois do STUART
+#df_tutors = df_tutors[df_tutors['data_hora'] >= '2020-11-17']
+
+
+df_tutors = df_tutors[df_tutors['meio']=='chat']
+df_tutors
+
+df_tutors_before = df_tutors[df_tutors['data_hora'] < '2021-01-06']
+df_tutors_after = df_tutors[df_tutors['data_hora'] >= '2021-01-06']
+
+def get_set_courses(df, column = 'cursos'):
+  cursos = df[column].unique()
+  set_cursos = []
+  for c in cursos:
+    if type(c) != str:
+      c = ''
+    list_cursos = c.split(', ')
+    set_cursos = set_cursos + list_cursos
+  set_cursos = set(set_cursos)
+  return set_cursos
+
+set_cursos_antes = get_set_courses(df_tutors_before,column = 'cursos')
+print("cursos dos alunos no chat antes do stuart")
+print(set_cursos_antes)
+
+set_cursos_depois = get_set_courses(df_tutors_after,column = 'cursos')
+print("\ncursos dos alunos no chat após o stuart")
+print(set_cursos_depois)
+
+set_cursos_stuart = get_set_courses(df[(df['autor_da_mensagem']!='STUART')],column = 'cursos_usuario')
+print("\ncursos dos alunos no chat do stuart")
+print(set_cursos_stuart)
+print('diferença dos cursos antes e do stuart')
+set_cursos_antes.difference(set_cursos_stuart)
