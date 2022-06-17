@@ -140,3 +140,49 @@ print("\ncursos dos alunos no chat do stuart")
 print(set_cursos_stuart)
 print('diferença dos cursos antes e do stuart')
 set_cursos_antes.difference(set_cursos_stuart)
+
+df.head()
+
+#Dados básicos
+print('quantidade de alunos diferentes em cada meio que interagiram')
+df_tutors[df_tutors['profile_sender']=='ALUNO'].groupby('meio')['id_sender'].nunique()
+
+df.head(1)
+df_tutors_before = df_tutors[df_tutors['data_hora'] < '2021-01-06']
+df_tutors_after = df_tutors[df_tutors['data_hora'] >= '2021-01-06']
+
+students_before = set(df_tutors_before[df_tutors_before['profile_sender']=='ALUNO']['id_sender'].unique())
+#students_before = students_before.union(set(df_tutors_before[df_tutors_before['profile_sender']=='PROFESSOR']['id_receiver'].unique()))
+students_stuart = df[df['autor_da_mensagem']!='STUART']['remetente'].nunique()
+students_after = set(df_tutors_after[df_tutors_after['profile_sender']=='ALUNO']['id_sender'].unique())
+#students_after = students_after.union(set(df_tutors_after[df_tutors_after['profile_sender']=='PROFESSOR']['id_receiver'].unique()))
+print('quantidade de estudantes que interagiram com STUART: {a}'.format(a=students_stuart))
+print('quantidade de estudantes antes do STUART: {a}'.format(a=len(students_before)))
+print('quantidade de estudantes depois do STUART: {a}'.format(a=len(students_after)))
+print('interseção entre os dois períodos: {a}'.format(a=len(students_before.intersection(students_after))))
+print('total: {a}'.format(a=len(students_before.union(students_after))))
+
+students_tutor_chat = set(df_tutors[(df_tutors['profile_sender']=='ALUNO') & 
+          (df_tutors['meio']=='chat')]['id_sender'].unique())
+
+students_stuart_chat = set(df[(df['autor_da_mensagem']!='STUART')]['remetente'].unique())
+
+print('total de estudantes no experimento: ',len(students_tutor_chat.union(students_stuart_chat)))
+
+# mensagens enviadas por alunos e tutores
+print('mensagens enviadas por alunos a tutores antes do stuart: ', len(df_tutors_before[df_tutors_before['profile_sender']=='ALUNO']))
+print('mensagens enviadas por alunos a tutores depois do stuart: ', len(df_tutors_after[df_tutors_after['profile_sender']=='ALUNO']))
+print()
+print('mensagens enviadas por tutores a alunos antes do stuart: ', len(df_tutors_before[df_tutors_before['profile_sender']!='ALUNO']))
+print('mensagens enviadas por tutores a alunos depois do stuart: ', len(df_tutors_after[df_tutors_after['profile_sender']!='ALUNO']))
+
+tutors_before = set(df_tutors_before[df_tutors_before['profile_sender']=='PROFESSOR']['id_sender'].unique())
+#tutors_before = tutors_before.union(set(df_tutors_before[df_tutors_before['profile_sender']=='ALUNO']['id_receiver'].unique()))
+
+tutors_after = set(df_tutors_after[df_tutors_after['profile_sender']=='PROFESSOR']['id_sender'].unique())
+#tutors_after = tutors_after.union(set(df_tutors_after[df_tutors_after['profile_sender']=='ALUNO']['id_receiver'].unique()))
+
+print('quantidade de tutores antes do STUART: {a}'.format(a=len(tutors_before)))
+print('quantidade de tutores depois do STUART: {a}'.format(a=len(tutors_after)))
+print('interseção entre os dois períodos: {a}'.format(a=len(tutors_before.intersection(tutors_after))))
+print('total: {a}'.format(a=len(tutors_before.union(tutors_after))))
