@@ -186,3 +186,60 @@ print('quantidade de tutores antes do STUART: {a}'.format(a=len(tutors_before)))
 print('quantidade de tutores depois do STUART: {a}'.format(a=len(tutors_after)))
 print('interseção entre os dois períodos: {a}'.format(a=len(tutors_before.intersection(tutors_after))))
 print('total: {a}'.format(a=len(tutors_before.union(tutors_after))))
+
+#Quantidades de vezes que o participante consulta o tutor humano e o chatbot
+# remove null
+print('Chat com STUART')
+df = df.dropna(subset=['mensagem'])
+print('Total de mensagens enviados:',len(df))
+#
+
+df['timestamp'] = pd.to_datetime(df['data_hora_mensagem']) #, format='%d/%m/%y %H:%M')
+
+janela = 'dia'
+
+if janela == 'semana':
+  frame = '168H' # one week
+elif janela == 'dia':
+  frame = '24H'
+elif janela == 'hora':
+  frame = '1H'
+elif janela == 'mês':
+  frame = '30D'
+
+timeseries = df.groupby('timestamp').count()['remetente']
+timeseries = timeseries.resample(frame).sum()
+print('Total de {a}s: {b}'.format(a=janela,b=len(timeseries)))
+print('Média de mensagens trocadas no chat do STUART por {a}: {b:.1f}'.format(a = janela, b = timeseries.mean()))
+
+
+#serie temporal
+frame = '24H'
+
+timeseries_users = df[df['autor_da_mensagem'] !='STUART'].groupby('timestamp').count()['remetente'].resample(frame).sum().to_frame()
+timeseries_users.reset_index(inplace=True)
+timeseries_users.columns = ['data_hora','mensagens']
+timeseries_users['destinatário'] = len(timeseries_users) * ['STUART']
+timeseries_users['MA'] = timeseries_users['mensagens'].rolling(window=14).mean()
+
+df_std2tut = df_tutors[(df_tutors['profile_sender']=='ALUNO') & (df_tutors['meio']=='chat')]
+timeseries_std2tut = df_std2tut.groupby('data_hora').count()['id_sender'].resample(frame).sum().to_frame()
+timeseries_std2tut.reset_index(inplace=True)
+timeseries_std2tut
+timeseries_std2tut.columns = ['data_hora','mensagens']
+timeseries_std2tut['destinatário'] = len(timeseries_std2tut)*['TUTORES']
+timeseries_std2tut['MA'] = timeseries_std2tut['mensagens'].rolling(window=14).mean()
+
+timeseries_std = pd.concat([timeseries_users,timeseries_std2tut])
+#timeseries_std = timeseries_std[timeseries_std['destinatário']=='TUTORES']
+
+fig = px.line(timeseries_std, x='data_hora', y='mensagens',
+              color="destinatário")
+
+fig.update_layout(legend=dict(
+    yanchor="bottom",
+    y=1.0,
+    xanchor="left",
+    x=0.01
+))
+fig.show()
