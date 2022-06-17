@@ -620,6 +620,54 @@ plt.figure(figsize=(10,10))
 plt.title('Quantidade de mensagens por aluno')
 sns.swarmplot(x="PcD", y="número de mensagens", palette=['C2','C1'],size=6, data=df_students) #['C2','C5']
 
+#Avaliações dos alunos nas recomendações
+
+df_evaluation = pd.read_csv('/content/drive/MyDrive/Mineracao/Log_avaliacoes/student_evaluation_202103021126.csv') 
+eval = df_evaluation['nm_evaluation']
+values = eval.value_counts()
+print('total de avaliações: ',len(df_evaluation))
+print(values)
+
+#plt.style.use('bmh')
+cols = ['gray','C2','C3']
+annotate_barchart(values,['Sem avaliação','Avaliação positiva','Avaliação negativa'], title = None, size = (10,5), col=cols, rotate_xticks=False)
+#plt.style.use('default')
+donnut(values,['Sem avaliação','Avaliação positiva','Avaliação negativa'],col=cols,pct=0.5)
+
+#plt.style.use('bmh')
+cols = ['C2','C3']
+annotate_barchart(values[1:],['Avaliação positiva','Avaliação negativa'], title = None, size = (10,5), col=cols, rotate_xticks=False)
+#plt.style.use('default')
+donnut(values[1:],['Avaliação positiva','Avaliação negativa'],col=cols,pct=0.5,size = (5,5))
+
+(df[(df['recomendacao']==True) & (df['timestamp'] > '2021-01-26')]).dropna(subset=['avaliacao_usuario'])
+
+(df[(df['recomendacao']==True) & (df['timestamp'] > '2021-01-27')])['avaliacao_usuario'].value_counts()
+
+(df[df['recomendacao']==True])
+
+total_rec = len(df[df['recomendacao']==True])
+total_nan = df[df['recomendacao']==True]['avaliacao_usuario'].isna().sum()
+total_aval = total_rec - total_nan
+reviews = df[df['recomendacao']==True]['avaliacao_usuario']
+#reviews.fillna(value=0,inplace=True)
+print('total de recomendações: {a:1d}'.format(a=total_rec))
+#print('total de avaliações não-nulas: {a:1d}'.format(a=total_aval))
+rec = reviews.value_counts()
+rec
+
+#plt.style.use('bmh')
+cols = ['gray','C2','C3']
+annotate_barchart(rec.values,['Sem avaliação','Avaliação positiva','Avaliação negativa'], title = None, size = (10,5), col=cols, rotate_xticks=False)
+#plt.style.use('default')
+donnut(rec.values,['Sem avaliação','Avaliação positiva','Avaliação negativa'],col=cols,pct=0.5)
+
+# apenas as avaliações contabilizadas
+cols = ['C2','C3']
+annotate_barchart(rec.values[1:],['Avaliação positiva','Avaliação negativa'], title = 'Avaliação de recomendações', size = (10,5), col=cols, rotate_xticks=False)
+#plt.style.use('default')
+donnut(rec.values[1:],['Avaliação positiva','Avaliação negativa'],col=cols)
+
 
 
 
