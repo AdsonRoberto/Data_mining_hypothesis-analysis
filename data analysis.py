@@ -433,4 +433,83 @@ sns.lineplot(data=timeseries_std, x='data_hora', y='MA',
              hue="destinatário", ax=ax)
 sns.lineplot(data=df_forecasted, x='data_hora', y='forecast', ax=ax, color='k', linestyle='--')
 
+# stuart and students
+timeseries_stuart = df[df['autor_da_mensagem'] =='STUART'].groupby('timestamp').count()['remetente'].resample(frame).sum().to_frame()
+timeseries_users = df[df['autor_da_mensagem'] !='STUART'].groupby('timestamp').count()['remetente'].resample(frame).sum().to_frame()
+df_timeseries = pd.concat([timeseries_stuart,timeseries_users])
+df_timeseries['autor'] = ['STUART']*len(timeseries_stuart) + ['USUÁRIOS']*len(timeseries_users)
+df_timeseries.reset_index(level=0, inplace=True)
+
+
+mean_stuart = timeseries_users.mean().values[0]
+
+print('Média de mensagens enviadas por alunos por {a} no chat para o STUART: {b:.1f}'.format(a=janela,b=mean_stuart))
+print()
+df_std2tut = df_tutors[(df_tutors['profile_sender']=='ALUNO') & (df_tutors['meio']=='chat')]
+timeseries_std2tut =  df_std2tut.groupby('data_hora').count()['id_sender'].resample(frame).sum().to_frame()
+#print('Média de mensagens enviadas por alunos por dia no chat para o tutores (geral):',timeseries_students_tutors.mean().values[0])
+
+timeseries_std2tut_after = timeseries_std2tut[timeseries_std2tut.index >= '2021-01-06']
+timeseries_std2tut_before = timeseries_std2tut[timeseries_std2tut.index < '2021-01-06']
+
+print('Mensagens no chat de alunos para tutores')
+timeseries_df = timeseries_std2tut_before.describe()
+timeseries_df['com STUART'] = timeseries_std2tut_after.describe().values
+timeseries_df.columns = ['sem STUART', 'com STUART']
+timeseries_df.round(1)
+
+# stuart and students
+frame = '7D'
+timeseries_stuart = df[df['autor_da_mensagem'] =='STUART'].groupby('data_hora_mensagem').count()['remetente'].resample(frame).sum().to_frame()
+timeseries_users = df[df['autor_da_mensagem'] !='STUART'].groupby('data_hora_mensagem').count()['remetente'].resample(frame).sum().to_frame()
+df_timeseries = pd.concat([timeseries_stuart,timeseries_users])
+df_timeseries['autor'] = ['STUART']*len(timeseries_stuart) + ['USUÁRIOS']*len(timeseries_users)
+df_timeseries.reset_index(level=0, inplace=True)
+
+mean_stuart = timeseries_users.mean().values[0]
+
+print('Média de mensagens enviadas por alunos por {a} no chat para o STUART: {b:.1f}'.format(a=janela,b=mean_stuart))
+print()
+df_std2tut = df_tutors[(df_tutors['profile_sender']=='ALUNO') & (df_tutors['meio']=='chat')]
+timeseries_std2tut =  df_std2tut.groupby('data_hora').count()['id_sender'].resample(frame).sum().to_frame()
+#print('Média de mensagens enviadas por alunos por dia no chat para o tutores (geral):',timeseries_students_tutors.mean().values[0])
+
+timeseries_std2tut_after = timeseries_std2tut[timeseries_std2tut.index >= '2021-01-06']
+timeseries_std2tut_before = timeseries_std2tut[timeseries_std2tut.index < '2021-01-06']
+
+print('Mensagens no chat de alunos para tutores')
+timeseries_df = timeseries_std2tut_before.describe()
+timeseries_df['com STUART'] = timeseries_users.describe().values
+timeseries_df.columns = ['mensagens para tutores', 'mensagens para STUART']
+timeseries_df.round(1)
+
+sns.set(style="darkgrid")
+antes = ['Sem STUART']*len(timeseries_std2tut_before)
+apos = ['Com STUART']*len(timeseries_std2tut_after)
+df_time_distributions = pd.concat([timeseries_std2tut_before.reset_index(),timeseries_std2tut_after.reset_index()])
+df_time_distributions['Presença do STUART'] = antes+apos
+df_time_distributions.columns = ['data_hora','mensagens', 'presença do STUART']
+plt.figure(figsize=(8,8))
+#plt.title('Distribuições de mensagens por intervalo de tempo de 1 {a}'.format(a=janela))
+sns.boxplot(x="presença do STUART", y="mensagens", palette=['C0','C3'], data=df_time_distributions) #['C2','C5']
+plt.show()
+
+before_mean = timeseries_std2tut_before.mean().values[0]
+after_mean = timeseries_std2tut_after.mean().values[0]
+
+print('Total de {a}s antes do STUART: {b}'.format(a=janela,b=len(timeseries_std2tut_before)))
+print('Média de mensagens enviadas por alunos por {a} no chat para o tutores (antes do STUART): {b:.1f}'.format(a=janela,b=before_mean))
+
+print()
+
+print('Total de {a}s depois do STUART: {b}'.format(a=janela,b=len(timeseries_std2tut_after)))
+print('Média de mensagens enviadas por alunos por {a} no chat para o tutores (depois do STUART): {b:.1f}'.format(a=janela,b=after_mean))
+print()
+variation = 100*(after_mean - before_mean)/before_mean
+print('Variação antes/depois: {a:.1f}%'.format(a=variation))
+
+print()
+variation_stuart = 100*(mean_stuart - after_mean)/after_mean
+print('Alunos enviaram em média {a:.1f}% a mais de mensagens para o STUART do que para tutores'.format(a=variation_stuart))
+
 
